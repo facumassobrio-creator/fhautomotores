@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+:root {
+  --background: #121214;
+  --foreground: #f5f5f5;
+  --brand-black: #121214;
+  --brand-white: #f5f5f5;
+  --brand-red: #1e3a8a;
+  --brand-red-dark: #1e40af;
+  --surface: #101010;
+  --surface-light: #1b1b1b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-black: var(--brand-black);
+  --color-brand-white: var(--brand-white);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-surface: var(--surface);
+  --color-surface-light: var(--surface-light);
+  --font-sans: var(--font-body);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--brand-black);
+  color: var(--brand-white);
+  font-family: var(--font-body), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #101010;
+  color: #f5f5f5;
+}
+
+select option:checked {
+  background-color: #a00000;
+  color: #ffffff;
+}
+
+select option:hover {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading), Impact, sans-serif;
+}
+
+@keyframes premium-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.4); }
+  50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(30, 58, 138, 0); }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sectionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes borderShine {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 58, 138, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(30, 58, 138, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 58, 138, 0);
+  }
+}
+
+.hero-reveal-1 { animation: heroFadeUp 500ms ease-out both; }
+.hero-reveal-2 { animation: heroFadeUp 650ms ease-out both; }
+.hero-reveal-3 { animation: heroFadeUp 800ms ease-out both; }
+.hero-reveal-4 { animation: heroFadeUp 950ms ease-out both; }
+
+.section-reveal { animation: sectionFadeIn 700ms ease-out both; }
+
+.premium-sheen {
+  transition: box-shadow 240ms ease, transform 240ms ease;
+}
+
+.premium-sheen:hover {
+  transform: translateY(-2px);
+  animation: borderShine 700ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-reveal-1,
+  .hero-reveal-2,
+  .hero-reveal-3,
+  .hero-reveal-4,
+  .section-reveal {
+    animation: none;
+  }
+
+  .premium-sheen,
+  .premium-sheen:hover {
+    transition: none;
+    transform: none;
+    animation: none;
+  }
+}
+
