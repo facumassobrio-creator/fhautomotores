@@ -114,8 +114,8 @@ export default async function Home() {
             <div className="mx-auto max-w-7xl rounded-[1.9rem] border border-white/18 bg-black/34 p-5 shadow-[0_25px_70px_-38px_rgba(0,0,0,0.96)] backdrop-blur-md sm:p-8 lg:p-10">
               <div>
                 <div className="grid gap-4 lg:grid-cols-[1.02fr_0.98fr] lg:items-start lg:gap-y-2">
-                  <div className="hero-reveal-2">
-                    <div className="hero-reveal-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-white/85">
+                  <div className="hero-reveal-2 flex flex-col items-center text-center lg:items-start lg:text-left">
+                    <div className="hero-reveal-1 mx-auto inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-white/85 lg:mx-0">
                       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: theme.colors.brandPrimary }} />
                       {home.hero.badge}
                     </div>
@@ -127,21 +127,21 @@ export default async function Home() {
                         width={460}
                         height={150}
                         priority
-                        className="mb-6 h-44 w-auto object-contain md:mb-8 md:h-60 lg:h-80"
+                        className="mx-auto mb-6 h-44 w-auto object-contain md:mb-8 md:h-60 lg:mx-0 lg:h-80"
                       />
-                      <h1 className="text-[clamp(1.9rem,6vw,3rem)] font-black leading-[0.98] tracking-tight" style={{ color: theme.colors.brandPrimary }}>
+                      <h1 className="text-center text-[clamp(1.9rem,6vw,3rem)] font-black leading-[0.98] tracking-tight lg:text-left" style={{ color: theme.colors.brandPrimary }}>
                         {home.hero.titleLines[1]}
                       </h1>
                     </div>
 
-                    <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/82 sm:text-lg">
+                    <p className="mt-6 max-w-2xl text-center text-base leading-relaxed text-white/82 sm:text-lg lg:text-left">
                       {home.hero.subtitle}
                     </p>
 
-                    <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <div className="mt-7 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
                       <a
                         href="#vehiculos"
-                        className="premium-sheen inline-flex min-w-44 items-center justify-center rounded-xl px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white transition duration-200 hover:opacity-92"
+                        className="premium-sheen inline-flex w-full min-w-44 items-center justify-center rounded-xl px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white transition duration-200 hover:opacity-92 sm:w-auto"
                         style={{ backgroundColor: theme.colors.brandPrimary }}
                       >
                         {home.hero.primaryCtaLabel}
@@ -150,7 +150,7 @@ export default async function Home() {
                         href={whatsappHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-w-44 items-center justify-center rounded-xl border border-white/70 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white transition duration-200 hover:bg-white hover:text-black"
+                        className="inline-flex w-full min-w-44 items-center justify-center rounded-xl border border-white/70 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white transition duration-200 hover:bg-white hover:text-black sm:w-auto"
                       >
                         {home.hero.secondaryCtaLabel}
                       </a>
