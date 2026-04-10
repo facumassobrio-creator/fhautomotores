@@ -160,21 +160,27 @@ export default async function Home() {
 
                   <div className="hero-reveal-4 order-2 lg:order-2">
                     {featuredVehicle ? (
-                      <div className="relative rounded-2xl border border-white/12 bg-black/25 p-2 sm:p-3">
-                        <VehicleCard vehicle={featuredVehicle} />
-                        <div className="mt-3 flex justify-end">
-                          <Link
-                            href="/vehicles"
-                            aria-label="Ir al listado completo de vehiculos"
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition duration-200 hover:border-white/40 hover:bg-white/10 sm:w-auto"
-                            style={{
-                              boxShadow: '0 8px 22px -16px rgba(0,0,0,0.85)',
-                            }}
-                          >
-                            Ver catálogo completo
-                            <span aria-hidden>↗</span>
-                          </Link>
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+                        <div className="relative flex-1 rounded-2xl border border-white/12 bg-black/25 p-2 sm:p-3">
+                          <VehicleCard vehicle={featuredVehicle} />
                         </div>
+
+                        <Link
+                          href="/vehicles"
+                          aria-label="Ir al catalogo completo"
+                          className="group inline-flex w-full cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-semibold tracking-[0.01em] text-white/90 transition duration-200 hover:bg-white/5 hover:text-white sm:px-5 lg:w-auto lg:min-w-64 lg:self-center"
+                          style={{
+                            boxShadow: '0 8px 20px -18px rgba(0,0,0,0.8)',
+                          }}
+                        >
+                          <span>Ver catálogo completo</span>
+                          <span
+                            aria-hidden
+                            className="text-base leading-none transition-transform duration-200 group-hover:translate-x-1"
+                          >
+                            →
+                          </span>
+                        </Link>
                       </div>
                     ) : (
                       <div className="rounded-2xl border border-white/14 bg-black/35 p-8 text-center text-white/70">
