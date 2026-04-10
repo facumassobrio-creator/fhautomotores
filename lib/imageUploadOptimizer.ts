@@ -1,9 +1,7 @@
 import sharp from 'sharp';
 
-const MAX_UPLOAD_IMAGE_DIMENSION = 1920;
-const JPEG_UPLOAD_QUALITY = 82;
+const MAX_UPLOAD_IMAGE_DIMENSION = 1600;
 const WEBP_UPLOAD_QUALITY = 80;
-const PNG_UPLOAD_QUALITY = 82;
 
 export interface OptimizedUploadImage {
   buffer: Buffer;
@@ -21,19 +19,22 @@ async function optimizeImageBuffer(input: Buffer) {
   const metadata = await image.metadata();
 
   if (!metadata.width || !metadata.height) {
-    return image;
+    return { image, wasResized: false };
   }
 
   if (metadata.width <= MAX_UPLOAD_IMAGE_DIMENSION && metadata.height <= MAX_UPLOAD_IMAGE_DIMENSION) {
-    return image;
+    return { image, wasResized: false };
   }
 
-  return image.resize({
-    width: MAX_UPLOAD_IMAGE_DIMENSION,
-    height: MAX_UPLOAD_IMAGE_DIMENSION,
-    fit: 'inside',
-    withoutEnlargement: true,
-  });
+  return {
+    image: image.resize({
+      width: MAX_UPLOAD_IMAGE_DIMENSION,
+      height: MAX_UPLOAD_IMAGE_DIMENSION,
+      fit: 'inside',
+      withoutEnlargement: true,
+    }),
+    wasResized: true,
+  };
 }
 
 export async function optimizeImageForUpload(file: File): Promise<OptimizedUploadImage> {
@@ -41,28 +42,20 @@ export async function optimizeImageForUpload(file: File): Promise<OptimizedUploa
   const mimeType = (file.type || '').toLowerCase();
 
   try {
-    const baseImage = await optimizeImageBuffer(originalBuffer);
+    const { image: baseImage, wasResized } = await optimizeImageBuffer(originalBuffer);
 
-    if (mimeType === 'image/png') {
+    if (mimeType === 'image/webp' && !wasResized) {
       return {
-        buffer: await baseImage.png({ compressionLevel: 9, quality: PNG_UPLOAD_QUALITY }).toBuffer(),
-        fileName: replaceExtension(file.name, '.png'),
-        contentType: 'image/png',
-      };
-    }
-
-    if (mimeType === 'image/webp') {
-      return {
-        buffer: await baseImage.webp({ quality: WEBP_UPLOAD_QUALITY }).toBuffer(),
+        buffer: originalBuffer,
         fileName: replaceExtension(file.name, '.webp'),
         contentType: 'image/webp',
       };
     }
 
     return {
-      buffer: await baseImage.jpeg({ quality: JPEG_UPLOAD_QUALITY, mozjpeg: true, progressive: true }).toBuffer(),
-      fileName: replaceExtension(file.name, '.jpg'),
-      contentType: 'image/jpeg',
+      buffer: await baseImage.webp({ quality: WEBP_UPLOAD_QUALITY }).toBuffer(),
+      fileName: replaceExtension(file.name, '.webp'),
+      contentType: 'image/webp',
     };
   } catch {
     return {

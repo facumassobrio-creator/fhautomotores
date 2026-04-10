@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { optimizeImagesBatch } from "@/lib/image/optimizeImage";
 
 export type VehicleFormValues = {
   brand: string;
@@ -43,21 +44,49 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
 
   const [primaryImage, setPrimaryImage] = useState<File | null>(null);
   const [extraImages, setExtraImages] = useState<File[]>([]);
+  const [isOptimizingImages, setIsOptimizingImages] = useState(false);
+  const [imageFeedback, setImageFeedback] = useState<string | null>(null);
+  const [primaryPreview, setPrimaryPreview] = useState<string | null>(null);
+  const [extraPreviews, setExtraPreviews] = useState<Array<{ name: string; url: string }>>([]);
 
   const [formError, setFormError] = useState<string | null>(null);
 
-  const primaryPreview = useMemo(() => {
-    if (!primaryImage) return null;
-    return URL.createObjectURL(primaryImage);
+  useEffect(() => {
+    if (!primaryImage) {
+      setPrimaryPreview(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(primaryImage);
+    setPrimaryPreview(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
   }, [primaryImage]);
 
-  const extraPreviews = useMemo(() => {
-    return extraImages.map((image) => ({ name: image.name, url: URL.createObjectURL(image) }));
+  useEffect(() => {
+    if (extraImages.length === 0) {
+      setExtraPreviews([]);
+      return;
+    }
+
+    const nextPreviews = extraImages.map((image) => ({ name: image.name, url: URL.createObjectURL(image) }));
+    setExtraPreviews(nextPreviews);
+
+    return () => {
+      nextPreviews.forEach((item) => URL.revokeObjectURL(item.url));
+    };
   }, [extraImages]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError(null);
+
+    if (isOptimizingImages) {
+      setFormError("Espere a que termine el procesamiento de imagenes.");
+      return;
+    }
 
     if (!brand || !model || !year || !price || !mileage || !fuelType || !transmission || !color) {
       setFormError("Por favor complete los campos obligatorios.");
@@ -83,7 +112,49 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
     try {
       await onSubmit(payload, { primaryImage, extraImages });
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "Error al guardar el vehículo");
+      setFormError(error instanceof Error ? error.message : "Error al guardar el vehiculo");
+    }
+  };
+
+  const handlePrimaryImageChange = async (file: File | null) => {
+    setImageFeedback(null);
+
+    if (!file) {
+      setPrimaryImage(null);
+      return;
+    }
+
+    setIsOptimizingImages(true);
+    try {
+      const { files, errors } = await optimizeImagesBatch([file]);
+      setPrimaryImage(files[0] ?? null);
+
+      if (errors.length > 0) {
+        setImageFeedback(`No se pudo procesar la imagen principal (${errors[0].fileName}).`);
+      }
+    } finally {
+      setIsOptimizingImages(false);
+    }
+  };
+
+  const handleExtraImagesChange = async (files: File[]) => {
+    setImageFeedback(null);
+
+    if (files.length === 0) {
+      setExtraImages([]);
+      return;
+    }
+
+    setIsOptimizingImages(true);
+    try {
+      const { files: optimizedFiles, errors } = await optimizeImagesBatch(files);
+      setExtraImages(optimizedFiles);
+
+      if (errors.length > 0) {
+        setImageFeedback(`${errors.length} imagen(es) no se pudieron procesar y fueron omitidas.`);
+      }
+    } finally {
+      setIsOptimizingImages(false);
     }
   };
 
@@ -95,11 +166,12 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-white/10 bg-black/45 p-6 shadow-[0_18px_42px_rgba(0,0,0,0.35)]">
       {formError && <div className="rounded-xl border border-red-700/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">{formError}</div>}
+      {imageFeedback && <div className="rounded-xl border border-amber-500/50 bg-amber-950/30 px-4 py-3 text-sm text-amber-200">{imageFeedback}</div>}
 
       <section className="rounded-xl border border-white/10 bg-black/30 p-4 md:p-5">
         <div className="mb-4">
           <h2 className="text-lg">Datos principales</h2>
-          <p className="text-sm text-white/65">Completá la información comercial y técnica de la unidad.</p>
+          <p className="text-sm text-white/65">Completa la informacion comercial y tecnica de la unidad.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -112,11 +184,11 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
             <input value={model} onChange={(e) => setModel(e.target.value)} disabled={disabled} className={fieldClassName} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/85">Versión</label>
+            <label className="block text-sm font-medium text-white/85">Version</label>
             <input value={variant} onChange={(e) => setVariant(e.target.value)} disabled={disabled} className={fieldClassName} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/85">Año *</label>
+            <label className="block text-sm font-medium text-white/85">Anio *</label>
             <input type="number" min={1900} max={2100} value={year} onChange={(e) => setYear(e.target.value)} disabled={disabled} className={fieldClassName} />
           </div>
           <div>
@@ -140,8 +212,8 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
             <input value={fuelType} onChange={(e) => setFuelType(e.target.value)} disabled={disabled} className={fieldClassName} placeholder="Ej: Nafta, GNC" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/85">Transmisión *</label>
-            <input value={transmission} onChange={(e) => setTransmission(e.target.value)} disabled={disabled} className={fieldClassName} placeholder="Manual/Automática" />
+            <label className="block text-sm font-medium text-white/85">Transmision *</label>
+            <input value={transmission} onChange={(e) => setTransmission(e.target.value)} disabled={disabled} className={fieldClassName} placeholder="Manual/Automatica" />
           </div>
           <div>
             <label className="block text-sm font-medium text-white/85">Color *</label>
@@ -151,27 +223,28 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
       </section>
 
       <section className="rounded-xl border border-white/10 bg-black/30 p-4 md:p-5">
-        <label className="block text-sm font-medium text-white/85">Descripción</label>
+        <label className="block text-sm font-medium text-white/85">Descripcion</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} disabled={disabled} className={fieldClassName} rows={4}></textarea>
       </section>
 
       <section className="rounded-xl border border-white/10 bg-black/30 p-4 md:p-5">
         <div className="mb-4">
-          <h2 className="text-lg">Imágenes</h2>
-          <p className="text-sm text-white/65">Cargá portada y galería. Las vistas previas son referenciales.</p>
+          <h2 className="text-lg">Imagenes</h2>
+          <p className="text-sm text-white/65">Carga portada y galeria. Las vistas previas son referenciales.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="block rounded-lg border border-white/15 bg-white/5 p-3">
             <span className="text-sm font-medium text-white/85">Imagen principal</span>
-            <input type="file" accept="image/*" onChange={(e) => setPrimaryImage(e.target.files?.[0] ?? null)} disabled={disabled} className="mt-2 block w-full text-sm text-white/75 file:mr-3 file:rounded-md file:border-0 file:bg-brand-red file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-brand-red-dark" />
+            <input type="file" accept="image/*" onChange={(e) => void handlePrimaryImageChange(e.target.files?.[0] ?? null)} disabled={disabled || isOptimizingImages} className="mt-2 block w-full text-sm text-white/75 file:mr-3 file:rounded-md file:border-0 file:bg-brand-red file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-brand-red-dark" />
           </label>
 
           <label className="block rounded-lg border border-white/15 bg-white/5 p-3">
-            <span className="text-sm font-medium text-white/85">Imágenes adicionales</span>
-            <input type="file" accept="image/*" multiple onChange={(e) => setExtraImages(Array.from(e.target.files ?? []))} disabled={disabled} className="mt-2 block w-full text-sm text-white/75 file:mr-3 file:rounded-md file:border-0 file:bg-white/15 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-white/25" />
+            <span className="text-sm font-medium text-white/85">Imagenes adicionales</span>
+            <input type="file" accept="image/*" multiple onChange={(e) => void handleExtraImagesChange(Array.from(e.target.files ?? []))} disabled={disabled || isOptimizingImages} className="mt-2 block w-full text-sm text-white/75 file:mr-3 file:rounded-md file:border-0 file:bg-white/15 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-white/25" />
           </label>
         </div>
+        {isOptimizingImages && <p className="mt-3 text-xs text-white/60">Procesando imagenes para optimizar peso y resolucion...</p>}
       </section>
 
       {primaryPreview && (
@@ -219,8 +292,8 @@ export default function VehicleForm({ initialValues, onSubmit, disabled, submitL
           </label>
         </div>
 
-        <button type="submit" disabled={disabled} className="rounded-md bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-70">
-          {submitLabel}
+        <button type="submit" disabled={disabled || isOptimizingImages} className="rounded-md bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-70">
+          {isOptimizingImages ? "Procesando imagenes..." : submitLabel}
         </button>
       </section>
     </form>
