@@ -127,7 +127,7 @@ export default async function Home() {
                         width={460}
                         height={150}
                         priority
-                        className="mb-6 h-44 w-auto object-contain md:mb-8 md:h-60 lg:h-[20rem]"
+                        className="mb-6 h-44 w-auto object-contain md:mb-8 md:h-60 lg:h-80"
                       />
                       <h1 className="text-[clamp(1.9rem,6vw,3rem)] font-black leading-[0.98] tracking-tight" style={{ color: theme.colors.brandPrimary }}>
                         {home.hero.titleLines[1]}
@@ -162,13 +162,19 @@ export default async function Home() {
                     {featuredVehicle ? (
                       <div className="relative rounded-2xl border border-white/12 bg-black/25 p-2 sm:p-3">
                         <VehicleCard vehicle={featuredVehicle} />
-                        <Link
-                          href="/vehicles"
-                          aria-label="Ir al listado completo de vehiculos"
-                          className="absolute right-2 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/72 text-lg text-white transition duration-200 hover:border-white/55 hover:bg-[#1E3A8A] sm:right-3"
-                        >
-                          →
-                        </Link>
+                        <div className="mt-3 flex justify-end">
+                          <Link
+                            href="/vehicles"
+                            aria-label="Ir al listado completo de vehiculos"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition duration-200 hover:border-white/40 hover:bg-white/10 sm:w-auto"
+                            style={{
+                              boxShadow: '0 8px 22px -16px rgba(0,0,0,0.85)',
+                            }}
+                          >
+                            Ver catálogo completo
+                            <span aria-hidden>↗</span>
+                          </Link>
+                        </div>
                       </div>
                     ) : (
                       <div className="rounded-2xl border border-white/14 bg-black/35 p-8 text-center text-white/70">

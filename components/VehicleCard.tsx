@@ -28,7 +28,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         backgroundColor: '#1a1d22',
         borderColor: 'rgba(255,255,255,0.12)',
       }}
-      className="group relative overflow-hidden rounded-2xl border shadow-[0_12px_28px_-14px_rgba(0,0,0,0.75)] transition-all duration-300 hover:scale-[1.015] hover:shadow-[0_22px_44px_-18px_rgba(0,0,0,0.9)]"
+      className="group relative overflow-hidden rounded-2xl border shadow-[0_12px_28px_-14px_rgba(0,0,0,0.75)] transform-gpu transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] motion-reduce:transform-none motion-reduce:transition-none"
     >
       <div
         className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -72,7 +72,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             src={primary_image_url}
             alt={vehicleTitle}
             fill
-            className="object-cover transition duration-500 group-hover:scale-110"
+            className="object-cover transform-gpu transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none"
             sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, (max-width: 1536px) 31vw, 420px"
           />
         ) : (
