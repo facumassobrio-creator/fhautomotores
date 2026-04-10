@@ -160,27 +160,8 @@ export default async function Home() {
 
                   <div className="hero-reveal-4 order-2 lg:order-2">
                     {featuredVehicle ? (
-                      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
-                        <div className="relative flex-1 rounded-2xl border border-white/12 bg-black/25 p-2 sm:p-3">
-                          <VehicleCard vehicle={featuredVehicle} />
-                        </div>
-
-                        <Link
-                          href="/vehicles"
-                          aria-label="Ir al catalogo completo"
-                          className="group inline-flex w-full cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm font-semibold tracking-[0.01em] text-white/90 transition duration-200 hover:bg-white/5 hover:text-white sm:px-5 lg:w-auto lg:min-w-64 lg:self-center"
-                          style={{
-                            boxShadow: '0 8px 20px -18px rgba(0,0,0,0.8)',
-                          }}
-                        >
-                          <span>Ver catálogo completo</span>
-                          <span
-                            aria-hidden
-                            className="text-base leading-none transition-transform duration-200 group-hover:translate-x-1"
-                          >
-                            →
-                          </span>
-                        </Link>
+                      <div className="relative rounded-2xl border border-white/12 bg-black/25 p-2 sm:p-3">
+                        <VehicleCard vehicle={featuredVehicle} />
                       </div>
                     ) : (
                       <div className="rounded-2xl border border-white/14 bg-black/35 p-8 text-center text-white/70">
